@@ -6,11 +6,6 @@ import { scoreToMonth } from '../data/scoreToMonths.js'
 export function ScoreChart({ childInfo, domainScores, totalProfile, lifeAgeMonths }) {
   const chartRef = useRef(null)
   const chartDomains = totalProfile ? [...domainScores, totalProfile] : domainScores
-  const maxMonth = Math.max(
-    ...chartDomains.flatMap((domain) => [domain.masteredMonth, domain.projectedMonth]),
-    lifeAgeMonths || 0,
-    12,
-  )
   const width = 1160
   const height = 1380
   const padding = { top: 226, right: 180, bottom: 118, left: 78 }
@@ -22,7 +17,7 @@ export function ScoreChart({ childInfo, domainScores, totalProfile, lifeAgeMonth
   const domainRightX = ageAxisRightX - 112
   const plotWidth = domainRightX - domainLeftX
   const plotHeight = height - padding.top - padding.bottom
-  const yMax = Math.max(84, Math.ceil(maxMonth / 12) * 12)
+  const yMax = 72
   const ticks = Array.from({ length: Math.floor(yMax / 12) + 1 }, (_, index) => index * 12)
   const minorTicks = Array.from({ length: yMax + 1 }, (_, index) => index)
   const childName = childInfo?.name?.trim() || ''
@@ -39,6 +34,10 @@ export function ScoreChart({ childInfo, domainScores, totalProfile, lifeAgeMonth
 
   function yForMonth(month) {
     return padding.top + plotHeight - (Math.min(month, yMax) / yMax) * plotHeight
+  }
+
+  function ageYearForTick(tick) {
+    return tick === yMax ? 7 : tick / 12
   }
 
   function pointFor(domain, index, monthType) {
@@ -236,10 +235,10 @@ export function ScoreChart({ childInfo, domainScores, totalProfile, lifeAgeMonth
                 {tick > 0 && (
                   <>
                     <text className="age-year-label" x={ageAxisLeftX - 54} y={y + 4} textAnchor="middle">
-                      {tick / 12}
+                      {ageYearForTick(tick)}
                     </text>
                     <text className="age-year-label" x={ageAxisRightX + 54} y={y + 4} textAnchor="middle">
-                      {tick / 12}
+                      {ageYearForTick(tick)}
                     </text>
                   </>
                 )}
