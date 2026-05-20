@@ -892,16 +892,32 @@ input:focus {
   font-size: 34px;
 }
 
-.report-panel pre {
+.report-draft {
   margin: 0;
-  white-space: pre-wrap;
   color: #2f3a40;
-  font-family: inherit;
-  line-height: 1.75;
   background: #fbfcfc;
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 16px;
+}
+
+.report-paragraph {
+  margin: 0;
+  color: #2f3a40;
+  font-size: 15px;
+  line-height: 1.85;
+  white-space: pre-wrap;
+}
+
+.report-paragraph + .report-paragraph {
+  margin-top: 8px;
+}
+
+.report-domain-term {
+  color: #1f2b31;
+  font-weight: 900;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 @media (max-width: 860px) {
@@ -1020,7 +1036,7 @@ input:focus {
     padding: 0;
   }
 
-  body.print-report-only .report-panel pre {
+  body.print-report-only .report-draft {
     border: 0;
     padding: 0;
     background: #fff;
