@@ -18,7 +18,7 @@ export function ScoreChart({ childInfo, domainScores, totalProfile, lifeAgeMonth
   const plotWidth = domainRightX - domainLeftX
   const plotHeight = height - padding.top - padding.bottom
   const yMax = 84
-  const lifeAgeLineMaxMonth = 72
+  const lifeAgeLineMaxMonth = 84
   const ticks = Array.from({ length: Math.floor(yMax / 12) + 1 }, (_, index) => index * 12)
   const minorTicks = Array.from({ length: yMax + 1 }, (_, index) => index)
   const childName = childInfo?.name?.trim() || ''
