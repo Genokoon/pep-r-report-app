@@ -17,7 +17,8 @@ export function ScoreChart({ childInfo, domainScores, totalProfile, lifeAgeMonth
   const domainRightX = ageAxisRightX - 112
   const plotWidth = domainRightX - domainLeftX
   const plotHeight = height - padding.top - padding.bottom
-  const yMax = 72
+  const yMax = 84
+  const lifeAgeLineMaxMonth = 72
   const ticks = Array.from({ length: Math.floor(yMax / 12) + 1 }, (_, index) => index * 12)
   const minorTicks = Array.from({ length: yMax + 1 }, (_, index) => index)
   const childName = childInfo?.name?.trim() || ''
@@ -34,10 +35,6 @@ export function ScoreChart({ childInfo, domainScores, totalProfile, lifeAgeMonth
 
   function yForMonth(month) {
     return padding.top + plotHeight - (Math.min(month, yMax) / yMax) * plotHeight
-  }
-
-  function ageYearForTick(tick) {
-    return tick === yMax ? 7 : tick / 12
   }
 
   function pointFor(domain, index, monthType) {
@@ -84,7 +81,7 @@ export function ScoreChart({ childInfo, domainScores, totalProfile, lifeAgeMonth
       .split('\n')
   }
 
-  const lifeAgeY = lifeAgeMonths === null ? null : yForMonth(lifeAgeMonths)
+  const lifeAgeY = lifeAgeMonths === null ? null : yForMonth(Math.min(lifeAgeMonths, lifeAgeLineMaxMonth))
 
   function printChartOnly() {
     const pageStyle = document.createElement('style')
@@ -235,10 +232,10 @@ export function ScoreChart({ childInfo, domainScores, totalProfile, lifeAgeMonth
                 {tick > 0 && (
                   <>
                     <text className="age-year-label" x={ageAxisLeftX - 54} y={y + 4} textAnchor="middle">
-                      {ageYearForTick(tick)}
+                      {tick / 12}
                     </text>
                     <text className="age-year-label" x={ageAxisRightX + 54} y={y + 4} textAnchor="middle">
-                      {ageYearForTick(tick)}
+                      {tick / 12}
                     </text>
                   </>
                 )}
