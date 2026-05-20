@@ -73,6 +73,10 @@ export function ScoreChart({ childInfo, domainScores, totalProfile, lifeAgeMonth
     )
   }
 
+  function hasReferenceScore(domain, score) {
+    return referenceScoresFor(domain).includes(Number(score))
+  }
+
   function splitDomainName(name) {
     return name
       .replace(' 운동', '\n운동')
@@ -317,7 +321,7 @@ export function ScoreChart({ childInfo, domainScores, totalProfile, lifeAgeMonth
                     </g>
                   )
                 })}
-                {domain.id !== 'developmentTotal' && (
+                {(domain.id !== 'developmentTotal' || Number.isFinite(domain.mastered)) && (
                   <>
                     <rect
                       className="emerging-box"
@@ -328,7 +332,7 @@ export function ScoreChart({ childInfo, domainScores, totalProfile, lifeAgeMonth
                       rx="3"
                     />
                     <text className="emerging-count" x={x} y={height - 69} textAnchor="middle">
-                      {domain.emerging}
+                      {domain.id === 'developmentTotal' ? domain.mastered : domain.emerging}
                     </text>
                   </>
                 )}
@@ -386,6 +390,8 @@ export function ScoreChart({ childInfo, domainScores, totalProfile, lifeAgeMonth
           {chartDomains.map((domain, index) => {
             const masteredPoint = pointFor(domain, index, 'masteredMonth')
             const projectedPoint = pointFor(domain, index, 'projectedMonth')
+            const shouldLabelMasteredPoint =
+              domain.id === 'developmentTotal' && !hasReferenceScore(domain, domain.mastered)
 
             return (
               <g key={`${domain.id}-points`}>
@@ -393,6 +399,11 @@ export function ScoreChart({ childInfo, domainScores, totalProfile, lifeAgeMonth
                   <circle className="score-point emerging-point" cx={projectedPoint.x} cy={projectedPoint.y} r="6" />
                 )}
                 <circle className="score-point mastered-point" cx={masteredPoint.x} cy={masteredPoint.y} r="6" />
+                {shouldLabelMasteredPoint && (
+                  <text className="point-label" x={masteredPoint.x + 10} y={masteredPoint.y + 4}>
+                    {domain.mastered}
+                  </text>
+                )}
               </g>
             )
           })}
