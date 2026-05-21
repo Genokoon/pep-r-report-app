@@ -1,3 +1,5 @@
+import { developmentAgeRank } from '../data/developmentAgeOrder.js'
+
 const domainIntroductions = {
   imitation:
     '다른 사람이 말한 것을 반복하는 언어모방 능력과 다른 사람이 흉내 내는 것을 모방하는 운동모방 능력으로 구성되어 있는 모방영역',
@@ -320,8 +322,8 @@ function pickItems(items, itemRatings, rating, limit, ageMonths = null) {
     .filter((item) => shouldIncludeInReport(item, rating, ageMonths))
     .sort((a, b) =>
       rating === 'pass'
-        ? b.midMonths - a.midMonths || b.number - a.number
-        : a.midMonths - b.midMonths || a.number - b.number,
+        ? developmentAgeRank(b) - developmentAgeRank(a)
+        : developmentAgeRank(a) - developmentAgeRank(b),
     )
     .slice(0, limit)
 }

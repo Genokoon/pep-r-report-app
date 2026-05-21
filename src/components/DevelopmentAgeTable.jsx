@@ -1,3 +1,5 @@
+import { compareDevelopmentAgeOrder } from '../data/developmentAgeOrder.js'
+
 const languageImitationItemIds = new Set([
   'pepR_014',
   'pepR_100',
@@ -112,7 +114,7 @@ export function DevelopmentAgeTable({ assessmentItems, itemDetails, itemRatings 
 function AgeDomainTable({ assessmentItems, domain, itemDetails, itemRatings }) {
   const rows = assessmentItems
     .filter((item) => item.domainId === domain.id)
-    .sort((a, b) => a.midMonths - b.midMonths || a.number - b.number)
+    .sort(compareDevelopmentAgeOrder)
 
   return (
     <section className="age-domain-table">
@@ -166,7 +168,7 @@ function sentenceLabel(label) {
 function AgeDomainSvgPage({ assessmentItems, domain, itemDetails, itemRatings }) {
   const rows = assessmentItems
     .filter((item) => item.domainId === domain.id)
-    .sort((a, b) => a.midMonths - b.midMonths || a.number - b.number)
+    .sort(compareDevelopmentAgeOrder)
   const width = 1120
   const height = 780
   const margin = 36
