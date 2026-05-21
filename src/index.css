@@ -1083,10 +1083,15 @@ input:focus {
     display: none;
   }
 
+  body.print-age-table-only .page-layout {
+    display: block;
+  }
+
   body.print-age-table-only .age-table-panel {
     border: 0;
     box-shadow: none;
     padding: 0;
+    width: 100%;
   }
 
   body.print-age-table-only .age-table-legend,

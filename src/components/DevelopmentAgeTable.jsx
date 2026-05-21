@@ -62,7 +62,7 @@ export function DevelopmentAgeTable({ assessmentItems, itemDetails, itemRatings 
   function printTableOnly() {
     const pageStyle = document.createElement('style')
     pageStyle.dataset.printAgeTablePage = 'true'
-    pageStyle.textContent = '@page { size: A4 landscape; margin: 10mm; }'
+    pageStyle.textContent = '@page { size: A4 portrait; margin: 5mm; }'
     document.head.appendChild(pageStyle)
     document.body.classList.add('print-age-table-only')
     window.print()
@@ -169,45 +169,47 @@ function AgeDomainSvgPage({ assessmentItems, domain, itemDetails, itemRatings })
   const rows = assessmentItems
     .filter((item) => item.domainId === domain.id)
     .sort(compareDevelopmentAgeOrder)
-  const width = 1120
-  const height = 780
-  const margin = 36
-  const tableTop = 86
-  const headerHeight = 30
-  const rowHeight = (height - tableTop - headerHeight - 30) / rows.length
-  const markerWidth = 44
-  const numberWidth = 170
-  const taskWidth = 620
+  const width = 780
+  const height = 1120
+  const margin = 22
+  const tableTop = 78
+  const headerHeight = 36
+  const tableBottom = height - 16
+  const rowHeight = (tableBottom - tableTop - headerHeight) / rows.length
+  const markerWidth = 52
+  const numberWidth = 126
+  const taskWidth = 420
   const monthWidth = width - margin * 2 - markerWidth - numberWidth - taskWidth
   const x0 = margin
   const x1 = x0 + markerWidth
   const x2 = x1 + numberWidth
   const x3 = x2 + taskWidth
   const x4 = x3 + monthWidth
-  const rowFontSize = rows.length > 22 ? 11 : 14
-  const taskLineHeight = rowFontSize + 2
+  const rowFontSize = rows.length > 24 ? 17 : rows.length > 18 ? 18 : 20
+  const taskLineHeight = rowFontSize + 3
+  const markerFontSize = rows.length > 24 ? 30 : rows.length > 18 ? 34 : 40
 
   return (
     <svg className="age-print-page" viewBox={`0 0 ${width} ${height}`} role="img">
       <rect width={width} height={height} fill="#fff" />
-      <text x={margin} y="42" fill="#111" fontSize="24" fontWeight="800">
+      <text x={margin} y="36" fill="#111" fontSize="28" fontWeight="800">
         {domain.title}
       </text>
-      <g fontSize="17" fontWeight="800">
-        <text x={margin} y="70" fill="#111">○ 합격</text>
-        <text x={margin + 95} y="70" fill="#115ad8">△ 싹트기</text>
-        <text x={margin + 220} y="70" fill="#ed2b24">X 불합격</text>
+      <g fontSize="19" fontWeight="800">
+        <text x={margin} y="64" fill="#111">○ 합격</text>
+        <text x={margin + 108} y="64" fill="#115ad8">△ 싹트기</text>
+        <text x={margin + 246} y="64" fill="#ed2b24">X 불합격</text>
       </g>
 
       <line x1={x0} x2={x4} y1={tableTop} y2={tableTop} stroke="#111" strokeWidth="1.4" />
       <line x1={x0} x2={x4} y1={tableTop + headerHeight} y2={tableTop + headerHeight} stroke="#111" strokeWidth="1.2" />
       {[x1, x2, x3].map((x) => (
-        <line key={x} x1={x} x2={x} y1={tableTop} y2={height - 30} stroke="#111" strokeWidth="1.1" />
+        <line key={x} x1={x} x2={x} y1={tableTop} y2={tableBottom} stroke="#111" strokeWidth="1.1" />
       ))}
-      <g fill="#111" fontSize="14" fontWeight="800" textAnchor="middle">
-        <text x={(x1 + x2) / 2} y={tableTop + 20}>문항번호</text>
-        <text x={(x2 + x3) / 2} y={tableTop + 20}>과제</text>
-        <text x={(x3 + x4) / 2} y={tableTop + 20}>발달연령(개월)</text>
+      <g fill="#111" fontSize="17" fontWeight="800" textAnchor="middle">
+        <text x={(x1 + x2) / 2} y={tableTop + 23}>문항번호</text>
+        <text x={(x2 + x3) / 2} y={tableTop + 23}>과제</text>
+        <text x={(x3 + x4) / 2} y={tableTop + 23}>발달연령(개월)</text>
       </g>
 
       {rows.map((item, index) => {
@@ -215,7 +217,7 @@ function AgeDomainSvgPage({ assessmentItems, domain, itemDetails, itemRatings })
         const y = tableTop + headerHeight + rowHeight * index
         const centerY = y + rowHeight / 2
         const taskText = `${sentenceLabel(item.label)}${sideText(item, itemDetails)}`
-        const lines = wrapText(taskText, rows.length > 22 ? 33 : 42).slice(0, 2)
+        const lines = wrapText(taskText, rows.length > 24 ? 24 : 30).slice(0, 2)
 
         return (
           <g key={item.id}>
@@ -225,7 +227,7 @@ function AgeDomainSvgPage({ assessmentItems, domain, itemDetails, itemRatings })
                 x={(x0 + x1) / 2}
                 y={centerY + rowFontSize / 2}
                 fill={markerColor(rating)}
-                fontSize={rows.length > 22 ? 23 : 28}
+                fontSize={markerFontSize}
                 fontWeight="800"
                 textAnchor="middle"
               >
