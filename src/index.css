@@ -103,16 +103,6 @@ h2 {
   max-width: 720px;
 }
 
-.privacy-note {
-  background: var(--surface-muted);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--accent-strong);
-  font-size: 14px;
-  line-height: 1.5;
-  padding: 16px;
-}
-
 .header-side {
   display: grid;
   gap: 10px;
@@ -120,8 +110,44 @@ h2 {
 
 .header-actions {
   display: grid;
-  grid-template-columns: 1fr 92px;
-  gap: 8px;
+  gap: 10px;
+}
+
+.sample-button {
+  width: 100%;
+}
+
+.file-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.file-actions button {
+  padding-inline: 8px;
+}
+
+.danger-button {
+  color: #8f2f2a;
+}
+
+.file-message {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+  text-align: right;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .page-tabs {
@@ -940,6 +966,10 @@ input:focus {
     grid-template-columns: 1fr;
   }
 
+  .file-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .form-grid,
   .domain-score-grid {
     grid-template-columns: 1fr;
@@ -1000,7 +1030,6 @@ input:focus {
     padding: 0;
   }
 
-  .privacy-note,
   .page-tabs,
   .page-status,
   .page-actions,

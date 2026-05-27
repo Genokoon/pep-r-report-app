@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { ChildInfoForm } from './components/ChildInfoForm.jsx'
 import { DevelopmentAgeTable } from './components/DevelopmentAgeTable.jsx'
 import { ReportPreview } from './components/ReportPreview.jsx'
@@ -98,10 +98,12 @@ const pages = [
 ]
 
 function App() {
+  const fileInputRef = useRef(null)
   const [childInfo, setChildInfo] = useState(initialChildInfo)
   const [itemRatings, setItemRatings] = useState(initialItemRatings)
   const [itemDetails, setItemDetails] = useState(initialItemDetails)
   const [activePage, setActivePage] = useState(pages[0].id)
+  const [fileMessage, setFileMessage] = useState('')
 
   const scoreResult = useMemo(
     () => calculateScores(domains, itemRatings, assessmentItems),
@@ -155,12 +157,71 @@ function App() {
     setChildInfo(sampleChildInfo)
     setItemRatings(sampleItemRatings)
     setItemDetails(sampleItemDetails)
+    setFileMessage('')
   }
 
   function resetInputs() {
     setChildInfo(initialChildInfo)
     setItemRatings(initialItemRatings)
     setItemDetails(initialItemDetails)
+    setFileMessage('')
+  }
+
+  function saveDataFile() {
+    const data = {
+      app: 'pep-r-report-app',
+      version: 1,
+      savedAt: new Date().toISOString(),
+      childInfo,
+      itemRatings,
+      itemDetails,
+    }
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+
+    link.href = url
+    link.download = dataFileName(childInfo)
+    link.click()
+    URL.revokeObjectURL(url)
+    setFileMessage('입력 내용을 JSON 파일로 저장했습니다.')
+  }
+
+  function openDataFilePicker() {
+    fileInputRef.current?.click()
+  }
+
+  function loadDataFile(event) {
+    const file = event.target.files?.[0]
+
+    if (!file) {
+      return
+    }
+
+    const reader = new FileReader()
+
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(String(reader.result || ''))
+        const loaded = normalizeSavedData(parsed)
+
+        setChildInfo(loaded.childInfo)
+        setItemRatings(loaded.itemRatings)
+        setItemDetails(loaded.itemDetails)
+        setFileMessage(`${file.name} 파일을 불러왔습니다.`)
+      } catch (error) {
+        setFileMessage(error.message || '파일을 불러오지 못했습니다.')
+      } finally {
+        event.target.value = ''
+      }
+    }
+
+    reader.onerror = () => {
+      setFileMessage('파일을 읽는 중 문제가 발생했습니다.')
+      event.target.value = ''
+    }
+
+    reader.readAsText(file)
   }
 
   const activePageIndex = pages.findIndex((page) => page.id === activePage)
@@ -183,17 +244,30 @@ function App() {
           <p>보고서 초안의 경우 다시 한번 읽어보시고 문장 구조, 오탈자 및 이상한 부분을 체크해보시길 권장합니다.</p>
         </div>
         <div className="header-side">
-          <aside className="privacy-note">
-            입력 내용은 서버에 저장하지 않고 현재 브라우저 화면에서만 계산됩니다.
-          </aside>
           <div className="header-actions">
-            <button type="button" onClick={fillSampleData}>
+            <button className="sample-button" type="button" onClick={fillSampleData}>
               테스트 데이터 입력
             </button>
-            <button className="secondary-button" type="button" onClick={resetInputs}>
-              초기화
-            </button>
+            <div className="file-actions" aria-label="입력 데이터 관리">
+              <button className="secondary-button" type="button" onClick={saveDataFile}>
+                저장
+              </button>
+              <button className="secondary-button" type="button" onClick={openDataFilePicker}>
+                불러오기
+              </button>
+              <button className="secondary-button danger-button" type="button" onClick={resetInputs}>
+                초기화
+              </button>
+            </div>
           </div>
+          <input
+            ref={fileInputRef}
+            className="visually-hidden"
+            type="file"
+            accept="application/json,.json"
+            onChange={loadDataFile}
+          />
+          {fileMessage && <p className="file-message">{fileMessage}</p>}
         </div>
       </header>
 
@@ -276,6 +350,52 @@ function App() {
       </div>
     </main>
   )
+}
+
+function dataFileName(childInfo) {
+  const childName = sanitizeFileName(childInfo.name) || 'PEP-R'
+  const year = childInfo.testDate?.slice(0, 4) || new Date().getFullYear()
+
+  return `${childName}-${year}.json`
+}
+
+function sanitizeFileName(value) {
+  return value.trim().replace(/[\\/:*?"<>|]/g, '').replace(/\s+/g, ' ')
+}
+
+function normalizeSavedData(data) {
+  if (!data || typeof data !== 'object') {
+    throw new Error('올바른 저장 파일이 아닙니다.')
+  }
+
+  const childInfo = {
+    ...initialChildInfo,
+    ...(isPlainObject(data.childInfo) ? data.childInfo : {}),
+  }
+  const itemRatings = {
+    ...initialItemRatings,
+  }
+  const itemDetails = isPlainObject(data.itemDetails) ? data.itemDetails : {}
+
+  if (!isPlainObject(data.itemRatings)) {
+    throw new Error('검사 결과 정보가 없는 파일입니다.')
+  }
+
+  assessmentItems.forEach((item) => {
+    const rating = data.itemRatings[item.id]
+
+    itemRatings[item.id] = ['pass', 'emerging', 'fail'].includes(rating) ? rating : ''
+  })
+
+  return {
+    childInfo,
+    itemRatings,
+    itemDetails,
+  }
+}
+
+function isPlainObject(value) {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
 }
 
 export default App
